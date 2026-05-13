@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanitizador MB - MATERIALMARINST 31-02</title>
+    <style>
+        :root { --navy: #002147; --gold: #c5a059; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 5px solid var(---navy); }
+        h1 { color: var(--navy); text-align: center; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 30px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        textarea { width: 100%; height: 250px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: none; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: var(--navy); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; }
+        button:hover { background: #003366; }
+        .search-box { margin-top: 40px; padding: 20px; background: #f9f9f9; border-radius: 6px; }
+        input[type="text"] { width: 100%; padding: 10px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        table { width: 100%; margin-top: 15px; border-collapse: collapse; background: white; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: var(--navy); color: white; }
+        .badge { background: #eef2f7; padding: 3px 8px; border-radius: 4px; font-family: monospace; font-weight: bold; color: #d63384; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🛡️ Sanitizador de Dados Ostensivos</h1>
+    <p class="subtitle">Conformidade MATERIALMARINST 31-02 | Privacidade Local por Design</p>
+
+    <div class="grid">
+        <div>
+            <h3>Entrada (Documento Original)</h3>
+            <textarea id="textoOriginal" placeholder="Cole aqui o texto com NIPs, Nomes e Endereços..."></textarea>
+            <button onclick="processar()">Sanitizar para IAG</button>
+        </div>
+        <div>
+            <h3>Saída (Segura para IAG)</h3>
+            <textarea id="textoSanitizado" readonly placeholder="O texto sanitizado aparecerá aqui..."></textarea>
+            <button onclick="copiarTexto()" style="background: var(--gold);">Copiar Texto</button>
+        </div>
+    </div>
+
+    <div class="search-box">
+        <h3>🔍 Auditoria e Reconstituição</h3>
+        <input type="text" id="campoBusca" onkeyup="filtrarTabela()" placeholder="Pesquise por pseudônimo ou dado original...">
+        <table id="tabelaMapeamento">
+            <thead>
+                <tr>
+                    <th>Pseudônimo</th>
+                    <th>Dado Original</th>
+                </tr>
+            </thead>
+            <tbody id="corpoTabela">
+                <!-- Dados inseridos via JS -->
+            </tbody>
+        </table>
+        <button onclick="limparSessao()" style="background: #dc3545; width: auto; padding: 8px 20px;">Limpar Tudo</button>
+    </div>
+</div>
+
+<script>
+    let mapeamentoLocal = new Map();
+
+    function gerarID(tipo) {
+        return `[${tipo}_${Math.random().toString(36).substr(2, 4).toUpperCase()}]`;
+    }
+
+    function processar() {
+        let texto = document.getElementById('textoOriginal').value;
+        
+        // Padrões: NIP (00.0000.00) e Nomes (CAIXA ALTA)
+        const padraoNIP = /\d{2}\.\d{4}\.\d{2}/g;
+        const padraoNome = /\b[A-ZÀ-Ÿ]{2,}(?:\s[A-ZÀ-Ÿ]{2,})+\b/g;
+
+        // Extrair e Mapear NIPs
+        let nips = texto.match(padraoNIP) || [];
+        nips.forEach(nip => {
+            if (![...mapeamentoLocal.values()].includes(nip)) {
+                mapeamentoLocal.set(gerarID('NIP'), nip);
+            }
+        });
+
+        // Extrair e Mapear Nomes
+        let nomes = texto.match(padraoNome) || [];
+        nomes.forEach(nome => {
+            if (![...mapeamentoLocal.values()].includes(nome)) {
+                mapeamentoLocal.set(gerarID('NOME'), nome);
+            }
+        });
+
+        // Substituir no texto
+        let textoFinal = texto;
+        mapeamentoLocal.forEach((valorReal, pseudonimo) => {
+            textoFinal = textoFinal.split(valorReal).join(pseudonimo);
+        });
+
+        document.getElementById('textoSanitizado').value = textoFinal;
+        atualizarTabela();
+    }
+
+    function atualizarTabela() {
+        const corpo = document.getElementById('corpoTabela');
+        corpo.innerHTML = '';
+        mapeamentoLocal.forEach((valorReal, pseudonimo) => {
+            corpo.innerHTML += `<tr><td><span class="badge">${pseudonimo}</span></td><td>${valorReal}</td></tr>`;
+        });
+    }
+
+    function filtrarTabela() {
+        let filtro = document.getElementById('campoBusca').value.toUpperCase();
+        let tr = document.getElementById('corpoTabela').getElementsByTagName('tr');
+        for (let i = 0; i < tr.length; i++) {
+            let td = tr[i].getElementsByTagName('td');
+            if (td[0] || td[1]) {
+                let txt1 = td[0].textContent || td[0].innerText;
+                let txt2 = td[1].textContent || td[1].innerText;
+                tr[i].style.display = (txt1.toUpperCase().indexOf(filtro) > -1 || txt2.toUpperCase().indexOf(filtro) > -1) ? "" : "none";
+            }
+        }
+    }
+
+    function copiarTexto() {
+        let copyText = document.getElementById("textoSanitizado");
+        copyText.select();
+        document.execCommand("copy");
+        alert("Texto copiado para a área de transferência!");
+    }
+
+    function limparSessao() {
+        if(confirm("Deseja limpar todos os dados da memória local?")) {
+            mapeamentoLocal.clear();
+            document.getElementById('textoOriginal').value = '';
+            document.getElementById('textoSanitizado').value = '';
+            atualizarTabela();
+        }
+    }
+</script>
+
+</body>
+</html>
