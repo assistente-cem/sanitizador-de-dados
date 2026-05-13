@@ -7,11 +7,11 @@
     <style>
         :root { --navy: #002147; --gold: #c5a059; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
-        .container { max-width: 1100px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 5px solid var(---navy); }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 5px solid var(--navy); }
         h1 { color: var(--navy); text-align: center; margin-bottom: 5px; }
         .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 30px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        textarea { width: 100%; height: 250px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: none; box-sizing: border-box; }
+        textarea { width: 100%; height: 250px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: none; box-sizing: border-box; font-size: 14px; }
         button { width: 100%; padding: 12px; background: var(--navy); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; }
         button:hover { background: #003366; }
         .search-box { margin-top: 40px; padding: 20px; background: #f9f9f9; border-radius: 6px; }
@@ -26,12 +26,12 @@
 
 <div class="container">
     <h1>🛡️ Sanitizador de Dados Ostensivos</h1>
-    <p class="subtitle">Conformidade MATERIALMARINST 31-02 | Privacidade Local por Design</p>
+    <p class="subtitle">Conformidade MATERIALMARINST 31-02 | Suporte a NIP com ou sem pontos</p>
 
     <div class="grid">
         <div>
             <h3>Entrada (Documento Original)</h3>
-            <textarea id="textoOriginal" placeholder="Cole aqui o texto com NIPs, Nomes e Endereços..."></textarea>
+            <textarea id="textoOriginal" placeholder="Ex: CT ROBERTO SILVA, NIP 88.8888.88 ou 88888888..."></textarea>
             <button onclick="processar()">Sanitizar para IAG</button>
         </div>
         <div>
@@ -51,11 +51,9 @@
                     <th>Dado Original</th>
                 </tr>
             </thead>
-            <tbody id="corpoTabela">
-                <!-- Dados inseridos via JS -->
-            </tbody>
+            <tbody id="corpoTabela"></tbody>
         </table>
-        <button onclick="limparSessao()" style="background: #dc3545; width: auto; padding: 8px 20px;">Limpar Tudo</button>
+        <button onclick="limparSessao()" style="background: #dc3545; width: auto; padding: 8px 20px; margin-top: 20px;">Limpar Tudo</button>
     </div>
 </div>
 
@@ -69,11 +67,14 @@
     function processar() {
         let texto = document.getElementById('textoOriginal').value;
         
-        // Padrões: NIP (00.0000.00) e Nomes (CAIXA ALTA)
-        const padraoNIP = /\d{2}\.\d{4}\.\d{2}/g;
+        // Regex atualizada: 
+        // (\d{2}\.\d{4}\.\d{2}) -> Formato com pontos
+        // | -> OU
+        // (\b\d{8}\b) -> Exatamente 8 dígitos numéricos isolados
+        const padraoNIP = /(\d{2}\.\d{4}\.\d{2})|(\b\d{8}\b)/g;
         const padraoNome = /\b[A-ZÀ-Ÿ]{2,}(?:\s[A-ZÀ-Ÿ]{2,})+\b/g;
 
-        // Extrair e Mapear NIPs
+        // Extrair NIPs
         let nips = texto.match(padraoNIP) || [];
         nips.forEach(nip => {
             if (![...mapeamentoLocal.values()].includes(nip)) {
@@ -81,7 +82,7 @@
             }
         });
 
-        // Extrair e Mapear Nomes
+        // Extrair Nomes
         let nomes = texto.match(padraoNome) || [];
         nomes.forEach(nome => {
             if (![...mapeamentoLocal.values()].includes(nome)) {
@@ -89,9 +90,10 @@
             }
         });
 
-        // Substituir no texto
+        // Substituição Global
         let textoFinal = texto;
         mapeamentoLocal.forEach((valorReal, pseudonimo) => {
+            // Usando split/join para substituir todas as ocorrências sem problemas de caracteres especiais na Regex
             textoFinal = textoFinal.split(valorReal).join(pseudonimo);
         });
 
@@ -121,10 +123,10 @@
     }
 
     function copiarTexto() {
-        let copyText = document.getElementById("textoSanitizado");
+        const copyText = document.getElementById("textoSanitizado");
         copyText.select();
         document.execCommand("copy");
-        alert("Texto copiado para a área de transferência!");
+        alert("Texto sanitizado copiado!");
     }
 
     function limparSessao() {
