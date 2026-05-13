@@ -3,57 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanitizador MB - MATERIALMARINST 31-02</title>
+    <title>Sanitizador MB - Ciclo Completo</title>
     <style>
-        :root { --navy: #002147; --gold: #c5a059; }
+        :root { --navy: #002147; --gold: #c5a059; --green: #28a745; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
-        .container { max-width: 1100px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 5px solid var(--navy); }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 5px solid var(--navy); }
         h1 { color: var(--navy); text-align: center; margin-bottom: 5px; }
         .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 30px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        textarea { width: 100%; height: 250px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: none; box-sizing: border-box; font-size: 14px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        h3 { font-size: 1.1em; color: var(--navy); border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        textarea { width: 100%; height: 300px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: none; box-sizing: border-box; font-size: 13px; background: #fff; }
+        .output-area { background: #fafafa; border-color: #ccc; }
         button { width: 100%; padding: 12px; background: var(--navy); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; }
-        button:hover { background: #003366; }
+        button:hover { opacity: 0.9; }
         .search-box { margin-top: 40px; padding: 20px; background: #f9f9f9; border-radius: 6px; }
         input[type="text"] { width: 100%; padding: 10px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         table { width: 100%; margin-top: 15px; border-collapse: collapse; background: white; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
         th { background: var(--navy); color: white; }
-        .badge { background: #eef2f7; padding: 3px 8px; border-radius: 4px; font-family: monospace; font-weight: bold; color: #d63384; }
+        .badge { background: #eef2f7; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-weight: bold; color: #d63384; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>🛡️ Sanitizador de Dados Ostensivos</h1>
-    <p class="subtitle">Conformidade MATERIALMARINST 31-02 | Suporte a NIP com ou sem pontos</p>
+    <h1>🛡️ Sanitizador e Reconversor MB</h1>
+    <p class="subtitle">Ciclo Fechado: Proteção na Ida, Reconstituição na Volta (MATERIALMARINST 31-02)</p>
 
     <div class="grid">
+        <!-- BLOCO 1: IDA -->
         <div>
-            <h3>Entrada (Documento Original)</h3>
-            <textarea id="textoOriginal" placeholder="Ex: CT ROBERTO SILVA, NIP 88.8888.88 ou 88888888..."></textarea>
-            <button onclick="processar()">Sanitizar para IAG</button>
+            <h3>1. Original (Local)</h3>
+            <textarea id="textoOriginal" placeholder="Cole o texto com dados reais aqui..."></textarea>
+            <button onclick="processarIda()">Sanitizar p/ IAG →</button>
         </div>
+
+        <!-- BLOCO 2: ENVIO -->
         <div>
-            <h3>Saída (Segura para IAG)</h3>
-            <textarea id="textoSanitizado" readonly placeholder="O texto sanitizado aparecerá aqui..."></textarea>
-            <button onclick="copiarTexto()" style="background: var(--gold);">Copiar Texto</button>
+            <h3>2. Para a IAG (Nuvem)</h3>
+            <textarea id="textoSanitizado" class="output-area" readonly placeholder="Texto protegido..."></textarea>
+            <button onclick="copiarTexto('textoSanitizado')" style="background: var(--gold);">Copiar p/ IAG</button>
+        </div>
+
+        <!-- BLOCO 3: VOLTA -->
+        <div>
+            <h3>3. Retorno da IAG</h3>
+            <textarea id="textoRetornoIA" placeholder="Cole aqui o texto que a IA te devolveu..."></textarea>
+            <button onclick="processarVolta()" style="background: var(--green);">← Reconverter p/ Real</button>
         </div>
     </div>
 
     <div class="search-box">
-        <h3>🔍 Auditoria e Reconstituição</h3>
+        <h3>🔍 Base de Dados da Sessão (De-Para)</h3>
         <input type="text" id="campoBusca" onkeyup="filtrarTabela()" placeholder="Pesquise por pseudônimo ou dado original...">
-        <table id="tabelaMapeamento">
-            <thead>
-                <tr>
-                    <th>Pseudônimo</th>
-                    <th>Dado Original</th>
-                </tr>
-            </thead>
-            <tbody id="corpoTabela"></tbody>
-        </table>
-        <button onclick="limparSessao()" style="background: #dc3545; width: auto; padding: 8px 20px; margin-top: 20px;">Limpar Tudo</button>
+        <div style="max-height: 200px; overflow-y: auto; margin-top:10px;">
+            <table id="tabelaMapeamento">
+                <thead>
+                    <tr><th>Pseudônimo</th><th>Dado Real</th></tr>
+                </thead>
+                <tbody id="corpoTabela"></tbody>
+            </table>
+        </div>
+        <button onclick="limparSessao()" style="background: #dc3545; width: auto; padding: 8px 20px; margin-top: 20px;">Limpar Memória Local</button>
     </div>
 </div>
 
@@ -64,17 +75,12 @@
         return `[${tipo}_${Math.random().toString(36).substr(2, 4).toUpperCase()}]`;
     }
 
-    function processar() {
+    // FASE 1: Sanitização (Original -> Pseudônimo)
+    function processarIda() {
         let texto = document.getElementById('textoOriginal').value;
-        
-        // Regex atualizada: 
-        // (\d{2}\.\d{4}\.\d{2}) -> Formato com pontos
-        // | -> OU
-        // (\b\d{8}\b) -> Exatamente 8 dígitos numéricos isolados
         const padraoNIP = /(\d{2}\.\d{4}\.\d{2})|(\b\d{8}\b)/g;
         const padraoNome = /\b[A-ZÀ-Ÿ]{2,}(?:\s[A-ZÀ-Ÿ]{2,})+\b/g;
 
-        // Extrair NIPs
         let nips = texto.match(padraoNIP) || [];
         nips.forEach(nip => {
             if (![...mapeamentoLocal.values()].includes(nip)) {
@@ -82,7 +88,6 @@
             }
         });
 
-        // Extrair Nomes
         let nomes = texto.match(padraoNome) || [];
         nomes.forEach(nome => {
             if (![...mapeamentoLocal.values()].includes(nome)) {
@@ -90,15 +95,28 @@
             }
         });
 
-        // Substituição Global
         let textoFinal = texto;
         mapeamentoLocal.forEach((valorReal, pseudonimo) => {
-            // Usando split/join para substituir todas as ocorrências sem problemas de caracteres especiais na Regex
             textoFinal = textoFinal.split(valorReal).join(pseudonimo);
         });
 
         document.getElementById('textoSanitizado').value = textoFinal;
         atualizarTabela();
+    }
+
+    // FASE 2: Reconversão (Pseudônimo -> Original)
+    function processarVolta() {
+        let textoIA = document.getElementById('textoRetornoIA').value;
+        if (!textoIA) { alert("Cole o texto retornado pela IA primeiro."); return; }
+
+        let textoReconstituido = textoIA;
+        mapeamentoLocal.forEach((valorReal, pseudonimo) => {
+            textoReconstituido = textoReconstituido.split(pseudonimo).join(valorReal);
+        });
+
+        // Substitui o texto original pelo reconstituído para visualização final
+        document.getElementById('textoOriginal').value = textoReconstituido;
+        alert("Texto reconstituído com sucesso! Verifique a coluna 1.");
     }
 
     function atualizarTabela() {
@@ -114,7 +132,7 @@
         let tr = document.getElementById('corpoTabela').getElementsByTagName('tr');
         for (let i = 0; i < tr.length; i++) {
             let td = tr[i].getElementsByTagName('td');
-            if (td[0] || td[1]) {
+            if (td[0] && td[1]) {
                 let txt1 = td[0].textContent || td[0].innerText;
                 let txt2 = td[1].textContent || td[1].innerText;
                 tr[i].style.display = (txt1.toUpperCase().indexOf(filtro) > -1 || txt2.toUpperCase().indexOf(filtro) > -1) ? "" : "none";
@@ -122,18 +140,16 @@
         }
     }
 
-    function copiarTexto() {
-        const copyText = document.getElementById("textoSanitizado");
+    function copiarTexto(id) {
+        const copyText = document.getElementById(id);
         copyText.select();
         document.execCommand("copy");
-        alert("Texto sanitizado copiado!");
     }
 
     function limparSessao() {
-        if(confirm("Deseja limpar todos os dados da memória local?")) {
+        if(confirm("Isso apagará a chave de reconversão. Continuar?")) {
             mapeamentoLocal.clear();
-            document.getElementById('textoOriginal').value = '';
-            document.getElementById('textoSanitizado').value = '';
+            document.querySelectorAll('textarea').forEach(t => t.value = '');
             atualizarTabela();
         }
     }
