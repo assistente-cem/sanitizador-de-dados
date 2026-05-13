@@ -3,57 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanitizador e Reconversor MB - Final</title>
+    <title>Sanitizador MB - Responsivo</title>
     <style>
-        :root { --navy: #002147; --gold: #c5a059; --green: #28a745; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 5px solid var(--navy); }
-        h1 { color: var(--navy); text-align: center; margin-bottom: 5px; }
-        .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 30px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
-        h3 { font-size: 1.1em; color: var(--navy); border-bottom: 2px solid #eee; padding-bottom: 5px; }
-        textarea { width: 100%; height: 350px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: none; box-sizing: border-box; font-size: 13px; background: #fff; }
+        :root { --navy: #002147; --gold: #c5a059; --green: #28a745; --light-bg: #f4f7f6; }
+        
+        * { box-sizing: border-box; }
+
+        body { 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            background: var(--light-bg); 
+            margin: 0; 
+            padding: 10px; 
+            line-height: 1.5;
+        }
+
+        .container { 
+            max-width: 1400px; 
+            margin: auto; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            border-top: 5px solid var(--navy); 
+        }
+
+        h1 { color: var(--navy); text-align: center; margin-bottom: 5px; font-size: 1.8rem; }
+        .subtitle { text-align: center; color: #666; font-size: 0.85rem; margin-bottom: 25px; }
+
+        /* Grid Responsivo: 1 coluna no celular, 3 no desktop */
+        .grid { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 20px; 
+        }
+
+        @media (min-width: 992px) {
+            .grid { grid-template-columns: 1fr 1fr 1fr; }
+            .container { padding: 30px; }
+            body { padding: 20px; }
+        }
+
+        .card { display: flex; flex-direction: column; }
+        
+        h3 { 
+            font-size: 1rem; 
+            color: var(--navy); 
+            border-bottom: 2px solid #eee; 
+            padding-bottom: 8px; 
+            margin-top: 0;
+        }
+
+        textarea { 
+            width: 100%; 
+            height: 300px; 
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            resize: vertical; 
+            font-size: 0.9rem; 
+            background: #fff;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus { border-color: var(--navy); outline: none; }
         .output-area { background: #fafafa; border-color: #ccc; }
-        button { width: 100%; padding: 12px; background: var(--navy); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; }
+
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            background: var(--navy); 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            margin-top: 12px; 
+            font-size: 0.95rem;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        button:active { transform: scale(0.98); }
         button:hover { opacity: 0.9; }
-        .search-box { margin-top: 40px; padding: 20px; background: #f9f9f9; border-radius: 6px; }
-        input[type="text"] { width: 100%; padding: 10px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        table { width: 100%; margin-top: 15px; border-collapse: collapse; background: white; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
-        th { background: var(--navy); color: white; }
-        .badge { background: #eef2f7; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-weight: bold; color: #d63384; }
+
+        /* Tabela e Busca */
+        .search-box { 
+            margin-top: 40px; 
+            padding: 20px; 
+            background: #f9f9f9; 
+            border-radius: 8px; 
+            border: 1px solid #eee;
+        }
+
+        input[type="text"] { 
+            width: 100%; 
+            padding: 12px; 
+            margin-top: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 6px; 
+        }
+
+        .table-container { 
+            overflow-x: auto; 
+            margin-top: 15px; 
+            max-height: 250px; 
+        }
+
+        table { width: 100%; border-collapse: collapse; min-width: 400px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+        th { background: var(--navy); color: white; position: sticky; top: 0; }
+        
+        .badge { 
+            background: #eef2f7; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; 
+            font-weight: bold; 
+            color: #d63384; 
+            font-size: 0.8rem;
+        }
+
+        .btn-danger { background: #dc3545; width: auto; padding: 10px 20px; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>🛡️ Sanitizador e Reconversor MB</h1>
-    <p class="subtitle">Conformidade MATERIALMARINST 31-02 | Geração de Documento Final</p>
+    <p class="subtitle">Conformidade MATERIALMARINST 31-02 | Proteção de Dados Local</p>
 
     <div class="grid">
-        <div>
+        <div class="card">
             <h3>1. Original (Local)</h3>
             <textarea id="textoOriginal" placeholder="Cole o texto com dados reais aqui..."></textarea>
             <button onclick="processarIda()">Sanitizar p/ IAG →</button>
         </div>
 
-        <div>
+        <div class="card">
             <h3>2. Para a IAG (Nuvem)</h3>
-            <textarea id="textoSanitizado" class="output-area" readonly placeholder="Texto protegido..."></textarea>
+            <textarea id="textoSanitizado" class="output-area" readonly placeholder="O texto protegido aparecerá aqui..."></textarea>
             <button onclick="copiarTexto('textoSanitizado')" style="background: var(--gold);">Copiar p/ IAG</button>
         </div>
 
-        <div>
+        <div class="card">
             <h3>3. Retorno da IAG</h3>
-            <textarea id="textoRetornoIA" placeholder="Cole aqui o texto que a IA te devolveu..."></textarea>
+            <textarea id="textoRetornoIA" placeholder="Cole aqui o texto devolvido pela IA..."></textarea>
             <button onclick="processarVolta()" style="background: var(--green);">← Reconverter p/ Real</button>
         </div>
     </div>
 
     <div class="search-box">
-        <h3>🔍 Base de Dados da Sessão (De-Para)</h3>
+        <h3>🔍 Base de Dados da Sessão</h3>
         <input type="text" id="campoBusca" onkeyup="filtrarTabela()" placeholder="Pesquise por pseudônimo ou dado original...">
-        <div style="max-height: 200px; overflow-y: auto; margin-top:10px;">
+        <div class="table-container">
             <table id="tabelaMapeamento">
                 <thead>
                     <tr><th>Pseudônimo</th><th>Dado Real</th></tr>
@@ -61,7 +162,7 @@
                 <tbody id="corpoTabela"></tbody>
             </table>
         </div>
-        <button onclick="limparSessao()" style="background: #dc3545; width: auto; padding: 8px 20px; margin-top: 20px;">Limpar Memória Local</button>
+        <button class="btn-danger" onclick="limparSessao()">Limpar Memória Local</button>
     </div>
 </div>
 
@@ -74,6 +175,7 @@
 
     function processarIda() {
         let texto = document.getElementById('textoOriginal').value;
+        if(!texto) return;
         const padraoNIP = /(\d{2}\.\d{4}\.\d{2})|(\b\d{8}\b)/g;
         const padraoNome = /\b[A-ZÀ-Ÿ]{2,}(?:\s[A-ZÀ-Ÿ]{2,})+\b/g;
 
@@ -113,31 +215,31 @@
     }
 
     function abrirJanelaFinal(conteudo) {
-        const novaJanela = window.open("", "_blank", "width=800,height=600");
+        const novaJanela = window.open("", "_blank", "width=800,height=700");
         novaJanela.document.write(`
             <html>
             <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Documento Reconstituído</title>
                 <style>
-                    body { font-family: sans-serif; padding: 30px; line-height: 1.6; color: #333; }
+                    body { font-family: sans-serif; padding: 20px; line-height: 1.6; color: #333; background: #fff; }
                     .header { border-bottom: 2px solid #002147; padding-bottom: 10px; margin-bottom: 20px; }
-                    textarea { width: 100%; height: 400px; border: 1px solid #ccc; padding: 15px; font-size: 14px; margin-bottom: 15px; }
-                    button { background: #002147; color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-                    button:hover { background: #003366; }
+                    textarea { width: 100%; height: 450px; border: 1px solid #ccc; padding: 15px; font-size: 14px; border-radius: 4px; }
+                    button { background: #002147; color: white; border: none; padding: 14px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; }
+                    @media (min-width: 600px) { button { width: auto; } }
                 </style>
             </head>
             <body>
-                <div class="header"><h2>📄 Documento Final (Dados Reconstituídos)</h2></div>
-                <p>O texto abaixo foi processado localmente e os dados originais foram restaurados.</p>
+                <div class="header"><h2>📄 Documento Reconstituído</h2></div>
+                <p>Os dados originais foram restaurados com sucesso.</p>
                 <textarea id="finalText">${conteudo}</textarea>
-                <br>
                 <button onclick="copiar()">Copiar Texto para Editor</button>
                 <script>
                     function copiar() {
                         const txt = document.getElementById('finalText');
                         txt.select();
                         document.execCommand('copy');
-                        alert('Copiado com sucesso!');
+                        alert('Texto copiado!');
                     }
                 <\/script>
             </body>
