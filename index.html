@@ -3,125 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanitizador MB - Responsivo</title>
+    <title>Sanitizador e Reconversor MB - Corporativo</title>
     <style>
         :root { --navy: #002147; --gold: #c5a059; --green: #28a745; --light-bg: #f4f7f6; }
-        
         * { box-sizing: border-box; }
-
-        body { 
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-            background: var(--light-bg); 
-            margin: 0; 
-            padding: 10px; 
-            line-height: 1.5;
-        }
-
-        .container { 
-            max-width: 1400px; 
-            margin: auto; 
-            background: white; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-            border-top: 5px solid var(--navy); 
-        }
-
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--light-bg); margin: 0; padding: 10px; line-height: 1.5; }
+        .container { max-width: 1400px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 5px solid var(--navy); }
         h1 { color: var(--navy); text-align: center; margin-bottom: 5px; font-size: 1.8rem; }
         .subtitle { text-align: center; color: #666; font-size: 0.85rem; margin-bottom: 25px; }
-
-        /* Grid Responsivo: 1 coluna no celular, 3 no desktop */
-        .grid { 
-            display: grid; 
-            grid-template-columns: 1fr; 
-            gap: 20px; 
-        }
-
-        @media (min-width: 992px) {
-            .grid { grid-template-columns: 1fr 1fr 1fr; }
-            .container { padding: 30px; }
-            body { padding: 20px; }
-        }
-
+        .grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media (min-width: 992px) { .grid { grid-template-columns: 1fr 1fr 1fr; } .container { padding: 30px; } body { padding: 20px; } }
         .card { display: flex; flex-direction: column; }
-        
-        h3 { 
-            font-size: 1rem; 
-            color: var(--navy); 
-            border-bottom: 2px solid #eee; 
-            padding-bottom: 8px; 
-            margin-top: 0;
-        }
-
-        textarea { 
-            width: 100%; 
-            height: 300px; 
-            padding: 12px; 
-            border: 1px solid #ddd; 
-            border-radius: 6px; 
-            resize: vertical; 
-            font-size: 0.9rem; 
-            background: #fff;
-            transition: border-color 0.2s;
-        }
-
+        h3 { font-size: 1rem; color: var(--navy); border-bottom: 2px solid #eee; padding-bottom: 8px; margin-top: 0; }
+        textarea { width: 100%; height: 320px; padding: 12px; border: 1px solid #ddd; border-radius: 6px; resize: vertical; font-size: 0.9rem; background: #fff; }
         textarea:focus { border-color: var(--navy); outline: none; }
         .output-area { background: #fafafa; border-color: #ccc; }
-
-        button { 
-            width: 100%; 
-            padding: 14px; 
-            background: var(--navy); 
-            color: white; 
-            border: none; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            margin-top: 12px; 
-            font-size: 0.95rem;
-            transition: transform 0.1s, opacity 0.2s;
-        }
-
+        button { width: 100%; padding: 14px; background: var(--navy); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 12px; font-size: 0.95rem; transition: transform 0.1s, opacity 0.2s; }
         button:active { transform: scale(0.98); }
         button:hover { opacity: 0.9; }
-
-        /* Tabela e Busca */
-        .search-box { 
-            margin-top: 40px; 
-            padding: 20px; 
-            background: #f9f9f9; 
-            border-radius: 8px; 
-            border: 1px solid #eee;
-        }
-
-        input[type="text"] { 
-            width: 100%; 
-            padding: 12px; 
-            margin-top: 10px; 
-            border: 1px solid #ccc; 
-            border-radius: 6px; 
-        }
-
-        .table-container { 
-            overflow-x: auto; 
-            margin-top: 15px; 
-            max-height: 250px; 
-        }
-
+        .search-box { margin-top: 40px; padding: 20px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; }
+        input[type="text"] { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ccc; border-radius: 6px; }
+        .table-container { overflow-x: auto; margin-top: 15px; max-height: 250px; }
         table { width: 100%; border-collapse: collapse; min-width: 400px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 0.85rem; }
         th { background: var(--navy); color: white; position: sticky; top: 0; }
-        
-        .badge { 
-            background: #eef2f7; 
-            padding: 4px 8px; 
-            border-radius: 4px; 
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; 
-            font-weight: bold; 
-            color: #d63384; 
-            font-size: 0.8rem;
-        }
-
+        .badge { background: #eef2f7; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-weight: bold; color: #d63384; font-size: 0.8rem; }
         .btn-danger { background: #dc3545; width: auto; padding: 10px 20px; margin-top: 20px; }
     </style>
 </head>
@@ -129,12 +35,12 @@
 
 <div class="container">
     <h1>🛡️ Sanitizador e Reconversor MB</h1>
-    <p class="subtitle">Conformidade MATERIALMARINST 31-02 | Proteção de Dados Local</p>
+    <p class="subtitle">Conformidade MATERIALMARINST 31-02 | Filtro Avançado de OMs, Postos e Graduações</p>
 
     <div class="grid">
         <div class="card">
             <h3>1. Original (Local)</h3>
-            <textarea id="textoOriginal" placeholder="Cole o texto com dados reais aqui..."></textarea>
+            <textarea id="textoOriginal" placeholder="Cole o texto com dados reais aqui...&#10;Ex: O Capitão-de-Fragata SILVA da Base Naval de Aratu, NIP 11223344..."></textarea>
             <button onclick="processarIda()">Sanitizar p/ IAG →</button>
         </div>
 
@@ -153,7 +59,7 @@
 
     <div class="search-box">
         <h3>🔍 Base de Dados da Sessão</h3>
-        <input type="text" id="campoBusca" onkeyup="filtrarTabela()" placeholder="Pesquise por pseudônimo ou dado original...">
+        <input type="text" id="campoBusca" onkeyup="filtrarTabela()" placeholder="Pesquise por pseudônimo ou termo original...">
         <div class="table-container">
             <table id="tabelaMapeamento">
                 <thead>
@@ -169,6 +75,42 @@
 <script>
     let mapeamentoLocal = new Map();
 
+    // DADOS INTEGRADOS DOS ANEXOS
+    const basePostosGraduacoes = [
+        "Almirante", "Alte", "Almirante-de-Esquadra", "Alte Esq", "AE", "Vice-Almirante", "V Alte", "VA", 
+        "Contra-Almirante", "C Alte", "CA", "Capitão-de-Mar-e-Guerra", "CMG", "Capitão-de-Fragata", "CF", 
+        "Capitão-de-Corveta", "CC", "Capitão-Tenente", "CT", "1º Tenente", "1º Ten", "1T", "2º Tenente", 
+        "2º Ten", "2T", "Guarda-Marinha", "GM", "Aspirante", "Asp", "Suboficial", "SO", "Primeiro-Sargento", 
+        "1º SG", "Segundo-Sargento", "2º SG", "Terceiro-Sargento", "3º SG", "Cabo", "CB", "Soldado", "SD", "Marinheiro", "MN"
+    ];
+
+    const baseOMs = [
+        "1º Batalhão de Operações Litorâneas dos Fuzileiros Navais", "1º BtlOpLitFN", "1º Esquadrão de Aeronaves Remotamente Pilotadas", "EsqdQE-1",
+        "1º Esquadrão de Helicópteros de Emprego Geral do Noroeste", "EsqdHU-91", "1º Esquadrão de Helicópteros de Emprego Geral do Norte", "EsqdHU-41",
+        "1º Esquadrão de Helicópteros de Emprego Geral do Oeste", "EsqdHU-61", "2º Batalhão de Operações Litorâneas dos Fuzileiros Navais", "2º BtlOpLitFN",
+        "3º Batalhão de Operações Litorâneas dos Fuzileiros Navais", "3º BtlOpLitFN", "4º Batalhão de Operações Litorâneas dos Fuzileiros Navais", "4º BtlOpLitFN",
+        "5º Batalhão de Operações Litorâneas dos Fuzileiros Navais", "5º BtlOpLitFN", "Adidâncias Navais", "Adidâncias", "Agência da Capitania dos Portos em Areia Branca", "AgABranca",
+        "Agência da Capitania dos Portos em Camocim", "AgCamocim", "Agência da Capitania dos Portos em São João da Barra", "AgSJBarra", "Agência Fluvial de Boca do Acre", "AgBAcre",
+        "Agência Fluvial de Bom Jesus da Lapa", "AgBJLapa", "Agência Fluvial de Cruzeiro do Sul", "AgCSul", "Agência Fluvial de Porto Murtinho", "AgPMurtinho",
+        "Almirantado", "ALMIRANTADO", "Arsenal de Marinha do Rio de Janeiro", "AMRJ", "Base de Submarinos da Ilha da Madeira", "BSIM", "Base Naval da Ilha das Cobras", "BNIC",
+        "Base Naval de Aratu", "BNA", "Base Naval de Ladário", "BNL", "Base Naval de Natal", "BNN", "Base Naval de Val de Cães", "BNVC", "Base Naval do Rio de Janeiro", "BNRJ",
+        "Capitânia dos Portos da Amazônia Oriental", "CPAOR", "Capitânia dos Portos da Bahia", "CPBA", "Capitânia dos Portos da Paraíba", "CPPB", "Capitânia dos Portos de Alagoas", "CPAL",
+        "Capitânia dos Portos de Pernambuco", "CPPE", "Capitânia dos Portos de Santa Catarina", "CPSC", "Capitânia dos Portos de São Paulo", "CPSP", "Capitânia dos Portos de Sergipe", "CPSE",
+        "Capitânia dos Portos do Ceará", "CPCE", "Capitânia dos Portos do Espírito Santo", "CPES", "Capitânia dos Portos do Maranhão", "CPMA", "Capitânia dos Portos do Paraná", "CPPR",
+        "Capitânia dos Portos do Piauí", "CPPI", "Capitânia dos Portos do Rio de Janeiro", "CPRJ", "Capitânia dos Portos do Rio Grande do Norte", "CPRN", "Capitânia dos Portos do Rio Grande do Sul", "CPRS",
+        "Capitânia Fluvial da Amazônia Ocidental", "CFAOC", "Capitânia Fluvial de Minas Gerais", "CFMG", "Capitânia Fluvial de Porto Velho", "CFPV", "Capitânia Fluvial do Rio Paraná", "CFRP",
+        "Centro de Adestramento Almirante Marques de Leão", "CAAML", "Centro de Apoio a Sistemas Operativos", "CASOP", "Centro de Auxílios à Navegação Almirante Moraes Rego", "CAMR",
+        "Centro de Comunicação Estratégica da Marinha", "CCEM", "Centro de Controle Interno da Marinha", "CCIMAR", "Centro de Defesa Nuclear, Biológica, Química e Radiológica da Marinha", "CDefNBQR-MB",
+        "Centro de Desenvolvimento Doutrinário de Guerra Naval", "CDDGN", "Centro de Guerra Acústica e Eletrônica da Marinha", "CGAEM", "Centro de Instrução Almirante Alexandrino", "CIAA",
+        "Centro de Instrução Almirante Braz de Aguiar", "CIABA", "Centro de Instrução Almirante Graça Aranha", "CIAGA", "Centro de Instrução Almirante Milcíades Portela Alves", "CIAMPA",
+        "Centro de Instrução Almirante Sylvio de Camargo", "CIASC", "Centro de Instrução Almirante Wandenkolk", "CIAW", "Centro de Inteligência da Marinha", "CIM",
+        "Comando da Força Aeronaval", "ComForAerNav", "Comando da Força de Fuzileiros da Esquadra", "FFE", "ComFFE", "Comando da Força de Submarinos", "ComForS", "Comando da Força de Superfície", "ComForSup",
+        "Comando da Marinha", "CM", "Comando de Operações Navais", "ComOpNav", "Corveta Barroso", "Cv Barroso", "Corveta Tamandaré", "Cv Tamandaré", "Diretoria de Hidrografia e Navegação", "DHN",
+        "Diretoria de Saúde da Marinha", "DSM", "Escola de Guerra Naval", "EGN", "Escola Naval", "EN", "Esquadrão de Guerra Cibernética", "EsqdGCiber", "Estado-Maior da Armada", "EMA",
+        "Hospital Naval Marcílio Dias", "HNMD", "Navio Aeródromo Multipropósito Atlântico", "NAM Atlântico", "Navio Patrulha Amazonas", "NPa Amazonas", "Navio Patrulha Araguari", "NPa Araguari",
+        "Navio-Escola Brasil", "NE Brasil", "Submarino Riachuelo", "S Riachuelo", "Submarino Álvaro Alberto", "SN Álvaro Alberto", "Tribunal Marítimo", "TM"
+    ];
+
     function gerarID(tipo) {
         return `[${tipo}_${Math.random().toString(36).substr(2, 4).toUpperCase()}]`;
     }
@@ -176,23 +118,41 @@
     function processarIda() {
         let texto = document.getElementById('textoOriginal').value;
         if(!texto) return;
-        const padraoNIP = /(\d{2}\.\d{4}\.\d{2})|(\b\d{8}\b)/g;
-        const padraoNome = /\b[A-ZÀ-Ÿ]{2,}(?:\s[A-ZÀ-Ÿ]{2,})+\b/g;
 
+        // 1. Mapear e substituir NIPs (formatos: 00.0000.00 ou 00000000)
+        const padraoNIP = /(\d{2}\.\d{4}\.\d{2})|(\b\d{8}\b)/g;
         let nips = texto.match(padraoNIP) || [];
         nips.forEach(nip => {
-            if (![...mapeamentoLocal.values()].includes(nip)) {
-                mapeamentoLocal.set(gerarID('NIP'), nip);
+            if (![...mapeamentoLocal.values()].includes(nip)) mapeamentoLocal.set(gerarID('NIP'), nip);
+        });
+
+        // 2. Mapear e substituir OMs / Meios Navais (Ordem decrescente de tamanho para evitar conflito de substring)
+        baseOMs.sort((a, b) => b.length - a.length).forEach(om => {
+            let regexOM = new RegExp(om.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g');
+            if (regexOM.test(texto) && ![...mapeamentoLocal.values()].includes(om)) {
+                mapeamentoLocal.set(gerarID('OM_NAVAL'), om);
             }
         });
 
+        // 3. Mapear e substituir Postos e Graduações
+        basePostosGraduacoes.sort((a, b) => b.length - a.length).forEach(posto => {
+            let regexPosto = new RegExp('\\b' + posto.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '\\b', 'g');
+            if (regexPosto.test(texto) && ![...mapeamentoLocal.values()].includes(posto)) {
+                mapeamentoLocal.set(gerarID('POSTO_GRAD'), posto);
+            }
+        });
+
+        // 4. Mapear e substituir Nomes próprios remanescentes (Palavras em CAIXA ALTA sequenciais)
+        const padraoNome = /\b[A-ZÀ-Ÿ]{2,}(?:\s[A-ZÀ-Ÿ]{2,})+\b/g;
         let nomes = texto.match(padraoNome) || [];
         nomes.forEach(nome => {
-            if (![...mapeamentoLocal.values()].includes(nome)) {
+            // Ignora se o termo capturado já for uma sigla de OM ou Posto mapeado
+            if (!baseOMs.includes(nome) && !basePostosGraduacoes.includes(nome) && ![...mapeamentoLocal.values()].includes(nome)) {
                 mapeamentoLocal.set(gerarID('NOME'), nome);
             }
         });
 
+        // Executar a substituição em cascata no texto final
         let textoFinal = texto;
         mapeamentoLocal.forEach((valorReal, pseudonimo) => {
             textoFinal = textoFinal.split(valorReal).join(pseudonimo);
@@ -230,8 +190,8 @@
                 </style>
             </head>
             <body>
-                <div class="header"><h2>📄 Documento Reconstituído</h2></div>
-                <p>Os dados originais foram restaurados com sucesso.</p>
+                <div class="header"><h2>📄 Documento Reconstituído (Dados Oficiais Restaurados)</h2></div>
+                <p>O texto abaixo foi restaurado localmente com as OMs, Postos e dados originais.</p>
                 <textarea id="finalText">${conteudo}</textarea>
                 <button onclick="copiar()">Copiar Texto para Editor</button>
                 <script>
@@ -239,7 +199,7 @@
                         const txt = document.getElementById('finalText');
                         txt.select();
                         document.execCommand('copy');
-                        alert('Texto copiado!');
+                        alert('Texto copiado com sucesso!');
                     }
                 <\/script>
             </body>
@@ -275,7 +235,7 @@
     }
 
     function limparSessao() {
-        if(confirm("Isso apagará a chave de reconversão. Continuar?")) {
+        if(confirm("Isso apagará todas as chaves desta sessão. Continuar?")) {
             mapeamentoLocal.clear();
             document.querySelectorAll('textarea').forEach(t => t.value = '');
             atualizarTabela();
