@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanitizador e Reconversor MB - Corporativo</title>
+    <title>Sanitizador MB - Precisão por Palavra Inteira</title>
     <style>
         :root { --navy: #002147; --gold: #c5a059; --green: #28a745; --light-bg: #f4f7f6; }
         * { box-sizing: border-box; }
@@ -35,7 +35,7 @@
 
 <div class="container">
     <h1>🛡️ Sanitizador e Reconversor MB</h1>
-    <p class="subtitle">Conformidade MATERIALMARINST 31-02 | Filtro Avançado de OMs, Postos e Graduações</p>
+    <p class="subtitle">Conformidade MATERIALMARINST 31-02 | Substituição Estrita por Palavra Inteira</p>
 
     <div class="grid">
         <div class="card">
@@ -75,7 +75,7 @@
 <script>
     let mapeamentoLocal = new Map();
 
-    // DADOS INTEGRADOS DOS ANEXOS
+    // BASE DE DADOS EXTRAÍDA DOS ANEXOS
     const basePostosGraduacoes = [
         "Almirante", "Alte", "Almirante-de-Esquadra", "Alte Esq", "AE", "Vice-Almirante", "V Alte", "VA", 
         "Contra-Almirante", "C Alte", "CA", "Capitão-de-Mar-e-Guerra", "CMG", "Capitão-de-Fragata", "CF", 
@@ -115,47 +115,58 @@
         return `[${tipo}_${Math.random().toString(36).substr(2, 4).toUpperCase()}]`;
     }
 
+    // Função auxiliar para escapar caracteres especiais e aplicar regras de palavra inteira (\b)
+    function criarRegexPalavraInteira(termo) {
+        let termoEscapado = termo.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        // Se o termo começa ou termina com caracteres especiais (como 1º ou [), ajustamos as fronteiras
+        let bordaInicio = /^[a-zA-Z0-9À-Ÿ]/.test(termo) ? '\\b' : '';
+        let bordaFim = /[a-zA-Z0-9À-Ÿ]$/.test(termo) ? '\\b' : '';
+        return new RegExp(bordaInicio + termoEscapado + bordaFim, 'g');
+    }
+
     function processarIda() {
         let texto = document.getElementById('textoOriginal').value;
         if(!texto) return;
 
-        // 1. Mapear e substituir NIPs (formatos: 00.0000.00 ou 00000000)
+        mapeamentoLocal.clear(); // Resgata consistência a cada clique inicial
+
+        // 1. Mapear NIPs
         const padraoNIP = /(\d{2}\.\d{4}\.\d{2})|(\b\d{8}\b)/g;
         let nips = texto.match(padraoNIP) || [];
         nips.forEach(nip => {
             if (![...mapeamentoLocal.values()].includes(nip)) mapeamentoLocal.set(gerarID('NIP'), nip);
         });
 
-        // 2. Mapear e substituir OMs / Meios Navais (Ordem decrescente de tamanho para evitar conflito de substring)
+        // 2. Mapear OMs / Meios Navais
         baseOMs.sort((a, b) => b.length - a.length).forEach(om => {
-            let regexOM = new RegExp(om.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g');
+            let regexOM = criarRegexPalavraInteira(om);
             if (regexOM.test(texto) && ![...mapeamentoLocal.values()].includes(om)) {
                 mapeamentoLocal.set(gerarID('OM_NAVAL'), om);
             }
         });
 
-        // 3. Mapear e substituir Postos e Graduações
+        // 3. Mapear Postos e Graduações
         basePostosGraduacoes.sort((a, b) => b.length - a.length).forEach(posto => {
-            let regexPosto = new RegExp('\\b' + posto.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '\\b', 'g');
+            let regexPosto = criarRegexPalavraInteira(posto);
             if (regexPosto.test(texto) && ![...mapeamentoLocal.values()].includes(posto)) {
                 mapeamentoLocal.set(gerarID('POSTO_GRAD'), posto);
             }
         });
 
-        // 4. Mapear e substituir Nomes próprios remanescentes (Palavras em CAIXA ALTA sequenciais)
+        // 4. Mapear Nomes próprios remanescentes em CAIXA ALTA
         const padraoNome = /\b[A-ZÀ-Ÿ]{2,}(?:\s[A-ZÀ-Ÿ]{2,})+\b/g;
         let nomes = texto.match(padraoNome) || [];
         nomes.forEach(nome => {
-            // Ignora se o termo capturado já for uma sigla de OM ou Posto mapeado
             if (!baseOMs.includes(nome) && !basePostosGraduacoes.includes(nome) && ![...mapeamentoLocal.values()].includes(nome)) {
                 mapeamentoLocal.set(gerarID('NOME'), nome);
             }
         });
 
-        // Executar a substituição em cascata no texto final
+        // Substituição precisa usando expressões regulares baseadas no termo real inteiro
         let textoFinal = texto;
         mapeamentoLocal.forEach((valorReal, pseudonimo) => {
-            textoFinal = textoFinal.split(valorReal).join(pseudonimo);
+            let rx = criarRegexPalavraInteira(valorReal);
+            textoFinal = textoFinal.replace(rx, pseudonimo);
         });
 
         document.getElementById('textoSanitizado').value = textoFinal;
@@ -167,6 +178,7 @@
         if (!textoIA) { alert("Cole o texto retornado pela IA primeiro."); return; }
 
         let textoReconstituido = textoIA;
+        // Substituição dos pseudônimos para o valor real (IDs gerados contêm colchetes, usamos tratamento direto)
         mapeamentoLocal.forEach((valorReal, pseudonimo) => {
             textoReconstituido = textoReconstituido.split(pseudonimo).join(valorReal);
         });
@@ -191,7 +203,6 @@
             </head>
             <body>
                 <div class="header"><h2>📄 Documento Reconstituído (Dados Oficiais Restaurados)</h2></div>
-                <p>O texto abaixo foi restaurado localmente com as OMs, Postos e dados originais.</p>
                 <textarea id="finalText">${conteudo}</textarea>
                 <button onclick="copiar()">Copiar Texto para Editor</button>
                 <script>
@@ -199,7 +210,7 @@
                         const txt = document.getElementById('finalText');
                         txt.select();
                         document.execCommand('copy');
-                        alert('Texto copiado com sucesso!');
+                        alert('Texto copiado!');
                     }
                 <\/script>
             </body>
