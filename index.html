@@ -2,74 +2,117 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Sanitizador MB v3.0</title>
+    <title>Sanitizador MB - Layout Profissional</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         :root { --navy: #002147; --gold: #c5a059; --green: #28a745; }
         body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 25px; border-radius: 8px; border-top: 5px solid var(--navy); }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        textarea { width: 100%; height: 250px; white-space: pre-wrap; font-family: monospace; border: 1px solid #ccc; padding: 10px; }
-        button { padding: 12px; border: none; cursor: pointer; color: white; font-weight: bold; width: 100%; margin-top: 10px; }
+        .container { max-width: 1400px; margin: auto; background: white; padding: 25px; border-radius: 8px; border-top: 5px solid var(--navy); }
+        h1 { color: var(--navy); text-align: center; margin-bottom: 5px; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
+        .card { display: flex; flex-direction: column; }
+        textarea { width: 100%; height: 400px; white-space: pre-wrap; font-family: monospace; border: 1px solid #ccc; padding: 10px; margin-top: 10px; }
+        button { padding: 12px; border: none; cursor: pointer; color: white; font-weight: bold; width: 100%; margin-top: 10px; border-radius: 4px; }
+        .btn-navy { background: var(--navy); }
+        .btn-gold { background: var(--gold); }
+        .btn-green { background: var(--green); }
+        .upload-area { border: 2px dashed var(--navy); padding: 10px; text-align: center; cursor: pointer; color: var(--navy); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>🛡️ Sanitizador MB</h1>
-    <input type="file" id="pdfInput" accept="application/pdf">
-    <div class="grid">
-        <textarea id="textoOriginal" placeholder="Texto original..."></textarea>
-        <textarea id="textoSanitizado" readonly placeholder="Texto sanitizado..."></textarea>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <img src="https://hit.yey.pw/hit?url=https://SEU_USUARIO.github.io/SEU_REPOSITORIO" alt="Contador">
     </div>
-    <button style="background: var(--navy)" onclick="processar()">Sanitizar Dados</button>
+
+    <div class="grid">
+        <div class="card">
+            <h3>1. Original (Local)</h3>
+            <div class="upload-area" onclick="document.getElementById('pdfInput').click()">Carregar PDF</div>
+            <input type="file" id="pdfInput" accept="application/pdf" style="display:none">
+            <textarea id="textoOriginal" placeholder="Cole o texto ou carregue um PDF..."></textarea>
+            <button class="btn-navy" onclick="processarIda()">Sanitizar p/ IAG →</button>
+        </div>
+
+        <div class="card">
+            <h3>2. Para a IAG (Nuvem)</h3>
+            <textarea id="textoSanitizado" readonly placeholder="Texto anonimizado..."></textarea>
+            <button class="btn-gold" onclick="copiar('textoSanitizado')">Copiar p/ IAG</button>
+        </div>
+
+        <div class="card">
+            <h3>3. Retorno da IAG</h3>
+            <textarea id="textoRetornoIA" placeholder="Cole o retorno da IA..."></textarea>
+            <button class="btn-green" onclick="processarVolta()">← Reconverter p/ Real</button>
+        </div>
+    </div>
 </div>
 
 <script>
-    const POSTOS = ["ALMIRANTE", "CAPITÃO-DE-FRAGATA", "TERCEIRO-SARGENTO", "CABO", "MARINHEIRO"]; // Adicione outros conforme necessário
-    
-    // Extração PDF Refinada
+    const POSTOS = ["ALMIRANTE", "CAPITÃO-DE-FRAGATA", "TERCEIRO-SARGENTO", "CABO", "MARINHEIRO"];
+    let mapa = new Map();
+
+    // Extração PDF
     document.getElementById('pdfInput').addEventListener('change', async (e) => {
         const file = e.target.files[0];
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-        let textoCompleto = "";
+        const pdf = await pdfjsLib.getDocument(await file.arrayBuffer()).promise;
+        let texto = "";
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const content = await page.getTextContent();
-            let lastY = null;
-            content.items.forEach(item => {
-                if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) textoCompleto += "\n";
-                textoCompleto += item.str + " ";
-                lastY = item.transform[5];
-            });
-            textoCompleto += "\n\n";
+            content.items.forEach(it => texto += it.str + " ");
+            texto += "\n\n";
         }
-        document.getElementById('textoOriginal').value = textoCompleto;
+        document.getElementById('textoOriginal').value = texto;
     });
 
-    function processar() {
+    function processarIda() {
         let texto = document.getElementById('textoOriginal').value;
+        mapa.clear();
         let count = 0;
 
-        // 1. Sanitizar NIPs
-        texto = texto.replace(/\d{2}\.\d{4}\.\d{2}/g, () => `[NIP_${++count}]`);
-
-        // 2. Sanitizar Postos (Iterar sobre a lista)
-        POSTOS.forEach(p => {
-            const regex = new RegExp(`\\b${p}\\b`, 'gi');
-            texto = texto.replace(regex, `[POSTO_${p}]`);
+        // Sanitizar NIPs
+        texto = texto.replace(/\d{2}\.\d{4}\.\d{2}/g, (match) => {
+            let id = `[NIP_${++count}]`;
+            mapa.set(id, match);
+            return id;
         });
 
-        // 3. Sanitizar Nomes em CAIXA ALTA (Excluindo siglas curtas e palavras comuns)
-        // Padrão: Palavras com 3+ letras, tudo maiúsculo, ignorando siglas comuns
+        // Sanitizar Postos
+        POSTOS.forEach(p => {
+            const regex = new RegExp(`\\b${p}\\b`, 'gi');
+            texto = texto.replace(regex, (match) => {
+                let id = `[POSTO_${++count}]`;
+                mapa.set(id, match);
+                return id;
+            });
+        });
+
+        // Sanitizar Nomes (Caixa Alta)
         const padraoNome = /\b[A-ZÀ-Ÿ]{3,}(?:\s[A-ZÀ-Ÿ]{3,})+\b/g;
         texto = texto.replace(padraoNome, (match) => {
             if (["MARINHA", "BRASIL", "CORPO", "QUADRO"].includes(match.split(" ")[0])) return match;
-            return `[NOME_${++count}]`;
+            let id = `[NOME_${++count}]`;
+            mapa.set(id, match);
+            return id;
         });
 
         document.getElementById('textoSanitizado').value = texto;
+    }
+
+    function processarVolta() {
+        let texto = document.getElementById('textoRetornoIA').value;
+        mapa.forEach((real, pseudo) => {
+            texto = texto.split(pseudo).join(real);
+        });
+        document.getElementById('textoRetornoIA').value = texto;
+    }
+
+    function copiar(id) {
+        document.getElementById(id).select();
+        document.execCommand("copy");
     }
 </script>
 </body>
