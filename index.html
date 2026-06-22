@@ -2,109 +2,74 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanitizador MB - Gestão Segura</title>
+    <title>Sanitizador MB v3.0</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
-        :root { --navy: #002147; --gold: #c5a059; --green: #28a745; --light-bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--light-bg); margin: 0; padding: 20px; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 25px; border-radius: 8px; border-top: 5px solid var(--navy); }
-        h1 { color: var(--navy); text-align: center; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
-        .card { display: flex; flex-direction: column; }
-        textarea { width: 100%; height: 300px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: vertical; }
-        button { padding: 12px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; margin-top: 10px; }
-        .btn-navy { background: var(--navy); }
-        .btn-gold { background: var(--gold); }
-        .btn-green { background: var(--green); }
-        .upload-area { margin-bottom: 10px; padding: 10px; border: 2px dashed var(--navy); text-align: center; cursor: pointer; }
+        :root { --navy: #002147; --gold: #c5a059; --green: #28a745; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 25px; border-radius: 8px; border-top: 5px solid var(--navy); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        textarea { width: 100%; height: 250px; white-space: pre-wrap; font-family: monospace; border: 1px solid #ccc; padding: 10px; }
+        button { padding: 12px; border: none; cursor: pointer; color: white; font-weight: bold; width: 100%; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>🛡️ Sanitizador e Reconversor MB</h1>
-    
+    <h1>🛡️ Sanitizador MB</h1>
+    <input type="file" id="pdfInput" accept="application/pdf">
     <div class="grid">
-        <div class="card">
-            <h3>1. Original (Local)</h3>
-            <div class="upload-area" onclick="document.getElementById('pdfInput').click()">
-                Clique para carregar PDF
-                <input type="file" id="pdfInput" accept="application/pdf" style="display:none">
-            </div>
-            <textarea id="textoOriginal" placeholder="Cole o texto ou carregue um PDF..."></textarea>
-            <button class="btn-navy" onclick="processarIda()">Sanitizar p/ IAG →</button>
-        </div>
-
-        <div class="card">
-            <h3>2. Para a IAG (Nuvem)</h3>
-            <textarea id="textoSanitizado" readonly></textarea>
-            <button class="btn-gold" onclick="copiarTexto('textoSanitizado')">Copiar p/ IAG</button>
-        </div>
-
-        <div class="card">
-            <h3>3. Retorno da IAG</h3>
-            <textarea id="textoRetornoIA" placeholder="Cole o retorno da IA..."></textarea>
-            <button class="btn-green" onclick="processarVolta()">← Reconverter p/ Real</button>
-        </div>
+        <textarea id="textoOriginal" placeholder="Texto original..."></textarea>
+        <textarea id="textoSanitizado" readonly placeholder="Texto sanitizado..."></textarea>
     </div>
+    <button style="background: var(--navy)" onclick="processar()">Sanitizar Dados</button>
 </div>
 
 <script>
-    let mapeamentoLocal = new Map();
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-    // Persistência: Carrega mapeamento ao abrir
-    window.onload = () => {
-        const saved = localStorage.getItem('mapaMB');
-        if(saved) mapeamentoLocal = new Map(JSON.parse(saved));
-    };
-
-    // Extração de PDF
+    const POSTOS = ["ALMIRANTE", "CAPITÃO-DE-FRAGATA", "TERCEIRO-SARGENTO", "CABO", "MARINHEIRO"]; // Adicione outros conforme necessário
+    
+    // Extração PDF Refinada
     document.getElementById('pdfInput').addEventListener('change', async (e) => {
         const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = async function() {
-            const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
-            let texto = "";
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const content = await page.getTextContent();
-                texto += content.items.map(it => it.str).join(" ") + "\n";
-            }
-            document.getElementById('textoOriginal').value = texto;
-        };
-        reader.readAsArrayBuffer(file);
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+        let textoCompleto = "";
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            let lastY = null;
+            content.items.forEach(item => {
+                if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) textoCompleto += "\n";
+                textoCompleto += item.str + " ";
+                lastY = item.transform[5];
+            });
+            textoCompleto += "\n\n";
+        }
+        document.getElementById('textoOriginal').value = textoCompleto;
     });
 
-    function processarIda() {
+    function processar() {
         let texto = document.getElementById('textoOriginal').value;
-        // Lógica de sanitização mantida...
-        // Exemplo simples de pseudonimização
-        const padraoNIP = /\d{2}\.\d{4}\.\d{2}/g;
-        let nips = texto.match(padraoNIP) || [];
-        nips.forEach((nip, i) => {
-            let id = `[NIP_${i}]`;
-            mapeamentoLocal.set(id, nip);
-            texto = texto.replace(nip, id);
+        let count = 0;
+
+        // 1. Sanitizar NIPs
+        texto = texto.replace(/\d{2}\.\d{4}\.\d{2}/g, () => `[NIP_${++count}]`);
+
+        // 2. Sanitizar Postos (Iterar sobre a lista)
+        POSTOS.forEach(p => {
+            const regex = new RegExp(`\\b${p}\\b`, 'gi');
+            texto = texto.replace(regex, `[POSTO_${p}]`);
         });
-        
+
+        // 3. Sanitizar Nomes em CAIXA ALTA (Excluindo siglas curtas e palavras comuns)
+        // Padrão: Palavras com 3+ letras, tudo maiúsculo, ignorando siglas comuns
+        const padraoNome = /\b[A-ZÀ-Ÿ]{3,}(?:\s[A-ZÀ-Ÿ]{3,})+\b/g;
+        texto = texto.replace(padraoNome, (match) => {
+            if (["MARINHA", "BRASIL", "CORPO", "QUADRO"].includes(match.split(" ")[0])) return match;
+            return `[NOME_${++count}]`;
+        });
+
         document.getElementById('textoSanitizado').value = texto;
-        localStorage.setItem('mapaMB', JSON.stringify([...mapeamentoLocal]));
-    }
-
-    function processarVolta() {
-        let texto = document.getElementById('textoRetornoIA').value;
-        mapeamentoLocal.forEach((real, pseudo) => {
-            texto = texto.split(pseudo).join(real);
-        });
-        alert("Texto restaurado! (Verifique o log)");
-        console.log(texto);
-    }
-
-    function copiarTexto(id) {
-        document.getElementById(id).select();
-        document.execCommand("copy");
     }
 </script>
 </body>
